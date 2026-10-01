@@ -69,3 +69,33 @@ run "resources_and_defaults" {
     error_message = "Storage Account security defaults do not match the V4 design."
   }
 }
+
+run "invalid_platform_storage_name_is_rejected" {
+  command = plan
+
+  variables {
+    resource_group_name  = "rg-headshot-api-dev-centralus"
+    storage_account_name = "st-headshot-dev"
+    location             = "centralus"
+    resource_group_tags = {
+      service     = "headshot-api"
+      team        = "platform-engineering"
+      env         = "dev"
+      cost-center = "11300"
+      provider    = "azure"
+      location    = "centralus"
+    }
+    storage_account_tags = {
+      service     = "headshot-api"
+      team        = "platform-engineering"
+      env         = "dev"
+      cost-center = "11300"
+      provider    = "azure"
+      location    = "centralus"
+    }
+  }
+
+  expect_failures = [
+    var.storage_account_name,
+  ]
+}

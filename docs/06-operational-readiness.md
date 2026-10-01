@@ -1,6 +1,6 @@
 # V6.1 — Remote-State-Backed Plan Proof
 
-**Status:** implemented, not yet published or executed in GitHub Actions
+**Status:** implemented, published, and proven in GitHub Actions
 **Scope:** trusted plan only
 
 ## Decision 1: state is platform infrastructure
@@ -42,25 +42,17 @@ Backend write capability required to acquire or release a state-lock lease does
 not imply authority to mutate managed Azure workloads. The plan identity remains
 `Reader` against the target subscription and workload control plane.
 
-## V6.1 authorization finding and validation sequence
+## V6.1 remote-state plan result
 
-The initial design assigned `Storage Blob Data Reader` to `trusted-plan`.
-Analysis of the AzureRM backend showed that normal Terraform state locking uses
-Azure Blob leases. Lease acquisition requires blob write capability, so
-`Storage Blob Data Reader` is expected to be insufficient even though
-`terraform plan` does not mutate managed Azure infrastructure.
+The real `trusted-plan` GitHub workflow successfully initialized the AzureRM
+backend, used the authoritative remote state, retained normal state locking,
+and completed `terraform plan`. No Terraform apply occurred and no managed
+Azure workload resources were created or modified.
 
-V6.1 deliberately validates that finding in this order:
-
-1. Publish V6.1 without changing the existing `Storage Blob Data Reader`
-   assignment.
-2. Run the real `trusted-plan` workflow against the remote backend.
-3. Confirm whether execution fails specifically at state locking or lease
-   acquisition.
-4. If confirmed, make a separate documented authorization decision.
-5. Prefer the least-privilege practical permission scoped to the dedicated
-   `tfstate` container.
-6. Do not disable Terraform state locking as a workaround.
+This proves the Friday POC remote-state plan path with its deployed identity
+and effective permissions. It does not broaden the plan identity's read-only
+role against the managed-workload control plane or establish a general-purpose
+RBAC recommendation for other backends and identities.
 
 ## Decision 2: plan and apply identities are separate
 

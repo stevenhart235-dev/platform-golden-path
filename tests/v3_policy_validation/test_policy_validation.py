@@ -41,6 +41,40 @@ class PolicyValidationTests(unittest.TestCase):
         )
         self.assertEqual(validate(document, self.contract)["result"], "PASS")
 
+    def test_invalid_environment_cli_reports_governance_violation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            normalized_path = Path(directory) / "effective-metadata.json"
+            with redirect_stdout(io.StringIO()):
+                normalize_code = main(
+                    [
+                        "normalize",
+                        "--consumer",
+                        str(FIXTURES / "consumer-invalid-environment.yaml"),
+                        "--platform",
+                        str(FIXTURES / "platform-friday.yaml"),
+                        "--contract",
+                        str(CONTRACT_PATH),
+                        "--output",
+                        str(normalized_path),
+                    ]
+                )
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                validate_code = main(
+                    [
+                        "validate",
+                        "--input",
+                        str(normalized_path),
+                        "--contract",
+                        str(CONTRACT_PATH),
+                    ]
+                )
+
+        self.assertEqual(normalize_code, 0)
+        self.assertEqual(validate_code, 1)
+        self.assertIn("[allowed-environment]", stdout.getvalue())
+        self.assertIn("env='banana'", stdout.getvalue())
+
     def test_deployment_provider_tag_mismatch_is_input_error(self):
         document = self.document()
         document["resources"][0]["effective_tags"]["provider"] = "aws"
