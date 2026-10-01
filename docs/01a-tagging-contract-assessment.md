@@ -92,3 +92,35 @@ The implementation must distinguish:
 - governance inheritance
 - provider-native inheritance
 - effective resource tags
+
+## 4. V2 Friday Contract Decision
+
+V2 is implemented as a bounded POC contract in
+`contracts/tagging/tagging-contract.yaml`. It separates consumer fields,
+platform-derived or configured fields, governed tag keys, and governance
+validation.
+
+The enforceable V2 rules cover only the effective tags needed on the Friday
+Resource Group and Storage Account: `service`, `team`, `env`, `cost-center`,
+`provider`, and `location`. Azure-native tag inheritance is not assumed.
+
+The POC uses the registered `headshot-api` demo service and configures
+`centralus` as its platform default. The service status and location default
+are POC metadata and configuration; they do not establish new enterprise
+approval or location policy.
+
+The source-required `platform` tag is represented as a deferred requirement.
+The capability identifier `azure-application-foundation` is not a governed
+`platform` value, and none of the registered Azure platform values accurately
+describes the Resource Group plus Storage Account capability. V2 therefore
+does not invent or enforce a platform mapping.
+
+Registry statuses are preserved where supplied but are not enforced because
+their semantics are not consistently defined. Cost-center validation uses
+registry membership because the source does not provide an enforceable
+pattern. All unresolved questions are isolated under `unresolved_governance`
+and are explicitly excluded from policy input.
+
+`conditional_rules` is retained as an empty extension point. V2 does not
+implement the remaining enterprise tagging model or any validator, policy,
+workflow, Terraform, or Azure resources.

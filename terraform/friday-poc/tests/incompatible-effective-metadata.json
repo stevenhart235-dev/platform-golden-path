@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "contract": {
+    "name": "friday-vertical-slice",
+    "version": "0.1.0"
+  },
+  "context": {
+    "capability": {
+      "id": "azure-application-foundation",
+      "version": "v0"
+    },
+    "deployment": {
+      "provider": "azure",
+      "location": "centralus"
+    }
+  },
+  "resources": [
+    {
+      "logical_id": "resourceGroups",
+      "type": "Microsoft.Resources/resourceGroups",
+      "effective_tags": {
+        "service": "headshot-api",
+        "team": "platform-engineering",
+        "env": "dev",
+        "cost-center": "11300",
+        "provider": "azure",
+        "location": "centralus"
+      }
+    }
+  ]
+}

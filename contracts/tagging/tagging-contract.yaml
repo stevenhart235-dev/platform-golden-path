@@ -1,0 +1,321 @@
+schema_version: "1.0"
+contract_version: "0.1.0"
+kind: tagging-contract
+
+metadata:
+  name: friday-vertical-slice
+  status: poc
+  sources:
+    - references/Clayco_Tagging_Framework 5.docx
+    - references/Clayco_Tag_Library 7.xlsx
+    - references/Clayco_Tagging_Worksheet 6.xlsx
+
+scope:
+  capability:
+    id: azure-application-foundation
+    version: v0
+    governed_tag: false
+  target:
+    provider: azure
+    subscription: existing
+  resources:
+    - type: Microsoft.Resources/resourceGroups
+      effective_tags_required: true
+    - type: Microsoft.Storage/storageAccounts
+      effective_tags_required: true
+  azure_native_tag_inheritance_assumed: false
+
+consumer_fields:
+  service:
+    required: true
+    type: string
+    governed_tag_key: service
+  team:
+    required: true
+    type: string
+    governed_tag_key: team
+  environment:
+    required: true
+    type: string
+    governed_tag_key: env
+  cost_center:
+    required: true
+    type: string
+    governed_tag_key: cost-center
+
+platform_fields:
+  provider:
+    source: platform-derived
+    governed_tag_key: provider
+    value: azure
+  location:
+    source: platform-configured
+    governed_tag_key: location
+    default: centralus
+    default_scope: friday-poc
+    governance_policy: false
+  platform:
+    source: platform-derived
+    governed_tag_key: platform
+    value: null
+    resolution: unresolved-governance-mapping
+    enforceable_in_v2: false
+
+governance_validation:
+  formatting:
+    keys_and_values:
+      lowercase_required: true
+      permitted_separator: hyphen
+      prohibited:
+        - spaces
+        - underscores
+        - camel-case
+        - pascal-case
+  applicability:
+    effective_tags:
+      - service
+      - team
+      - env
+      - cost-center
+      - provider
+      - location
+    resource_types:
+      - Microsoft.Resources/resourceGroups
+      - Microsoft.Storage/storageAccounts
+  enforceable_rules:
+    - id: required-effective-tags
+      assertion: required
+      tag_keys:
+        - service
+        - team
+        - env
+        - cost-center
+        - provider
+        - location
+    - id: registered-service
+      assertion: registry-membership
+      tag_key: service
+      registry: service
+    - id: registered-team
+      assertion: registry-membership
+      tag_key: team
+      registry: team
+    - id: allowed-environment
+      assertion: registry-membership
+      tag_key: env
+      registry: env
+    - id: registered-cost-center
+      assertion: registry-membership
+      tag_key: cost-center
+      registry: cost-center
+    - id: azure-provider
+      assertion: equals
+      tag_key: provider
+      value: azure
+    - id: azure-location
+      assertion: registry-membership
+      tag_key: location
+      registry: azure-location
+  deferred_source_requirements:
+    - tag_key: platform
+      source_requirement: required-on-all-in-scope-resources
+      enforceable_in_v2: false
+      reason: no-registered-value-describes-resource-group-plus-storage-capability
+  registry_status_policy:
+    preserve_metadata: true
+    enforce_status: false
+    reason: source-status-semantics-are-not-defined-consistently
+  conditional_rules: []
+
+registries:
+  service:
+    value_model: curated-free-form
+    values:
+      - value: headshot-api
+        source_status: demo
+        status_interpretation: poc-source-metadata-only
+  team:
+    value_model: curated-free-form
+    values:
+      - cloud-engineering
+      - infrastructure-services
+      - network-engineering
+      - platform-engineering
+      - data-engineering
+      - security-engineering
+      - clayco-ai
+      - soc
+      - grc
+      - data-protection
+      - iam
+      - development
+      - service-delivery
+      - workplace-engineering
+      - field-support
+      - collaboration
+      - vdc
+      - facilities
+  env:
+    value_model: enum
+    values:
+      - dev
+      - stage
+      - test
+      - prod
+      - sandbox
+  cost-center:
+    value_model: registry
+    values:
+      - "1"
+      - "4"
+      - "21"
+      - "41"
+      - "42"
+      - "43"
+      - "44"
+      - "45"
+      - "46"
+      - "47"
+      - "48"
+      - "49"
+      - "51"
+      - "52"
+      - "53"
+      - "55"
+      - "56"
+      - "57"
+      - "61"
+      - "62"
+      - "63"
+      - "64"
+      - "65"
+      - "66"
+      - "81"
+      - "101"
+      - "241"
+      - "252"
+      - "253"
+      - "255"
+      - "256"
+      - "257"
+      - "261"
+      - "1001"
+      - "1011"
+      - "1021"
+      - "1031"
+      - "6001"
+      - "6002"
+      - "6004"
+      - "6005"
+      - "6006"
+      - "6007"
+      - "10150"
+      - "10151"
+      - "11100"
+      - "11150"
+      - "11200"
+      - "11250"
+      - "11251"
+      - "11300"
+      - "11350"
+      - "11351"
+      - "11355"
+      - "11400"
+      - "11450"
+      - "11500"
+      - "11550"
+      - "11551"
+      - "11552"
+      - "11600"
+      - "11650"
+      - "11700"
+      - "11750"
+      - "11800"
+      - "11810"
+      - "11850"
+      - "11975"
+      - "11976"
+      - "21002"
+      - "40000"
+      - "41000"
+      - "41100"
+      - "41200"
+      - "41300"
+      - "41500"
+      - "41600"
+      - "41650"
+      - "42650"
+      - "49650"
+      - "50000"
+      - "50050"
+      - "50150"
+      - "50200"
+      - "50250"
+      - "50300"
+      - "50350"
+      - "50450"
+      - "50550"
+      - "50750"
+      - "60000"
+      - "70000"
+      - "71000"
+      - "72000"
+      - "72001"
+      - "73000"
+      - "74000"
+      - "75000"
+      - "76000"
+      - "77000"
+      - "78000"
+      - "79000"
+  provider:
+    value_model: enum
+    values:
+      - value: azure
+        source_status: active
+  azure-location:
+    value_model: provider-discriminated-registry
+    discriminator:
+      tag_key: provider
+      value: azure
+    values:
+      - value: northcentralus
+        source_status: active
+      - value: southcentralus
+        source_status: active
+      - value: centralus
+        source_status: active
+      - value: westus3
+        source_status: inactive
+      - value: eastus2
+        source_status: inactive
+      - value: global
+        source_status: active
+  azure-platform:
+    value_model: provider-discriminated-registry
+    discriminator:
+      tag_key: provider
+      value: azure
+    values:
+      - azure-vm
+      - aks
+      - functions
+      - ase
+      - aci
+
+unresolved_governance:
+  enforceable: false
+  policy_input: false
+  items:
+    - id: registry-status-semantics
+      question: Which registry statuses represent approved deployable values?
+      v2_treatment: Preserve status metadata without enforcing it.
+    - id: platform-capability-mapping
+      question: Which governed platform value applies to an Azure Resource Group and Storage Account foundation?
+      v2_treatment: Do not equate capability with platform and do not invent a value.
+    - id: cost-center-pattern
+      question: What exact pattern implements the documented cost-center value model?
+      v2_treatment: Enforce registry membership only; no regex is defined.
+    - id: azure-effective-tagging-mechanism
+      question: Which future provisioning or policy mechanism guarantees effective tags on both resource types?
+      v2_treatment: State resource applicability without claiming Azure-native inheritance.

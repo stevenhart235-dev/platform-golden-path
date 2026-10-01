@@ -1,0 +1,6 @@
+schema_version: "1.0"
+capability:
+  id: azure-application-foundation
+  version: v0
+provider: azure
+location: centralus
